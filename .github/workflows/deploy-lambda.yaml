@@ -1,6 +1,11 @@
 name: Deploy Lambda
 
 on:
+  workflow_run:
+    workflows: ["Deploy S3 bucket and IAM Role"]
+    types:
+      - completed
+
   push:
     paths:
       - "lambda/**"

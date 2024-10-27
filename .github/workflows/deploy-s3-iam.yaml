@@ -27,7 +27,7 @@ jobs:
       - name: Deploy to AWS CloudFormation
         run: |
           aws cloudformation deploy \
-            --template-file infrastructure/templates/template.yml \
+            --template-file infrastructure/template.yaml \
             --stack-name photo-upload-infrastructure \
             --parameter-overrides BucketName=my-photo-bucket-${{ github.sha }} \
             --capabilities CAPABILITY_IAM
