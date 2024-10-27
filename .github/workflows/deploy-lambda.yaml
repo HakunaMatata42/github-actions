@@ -49,7 +49,7 @@ jobs:
           BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name photo-upload-infrastructure --query "Stacks[0].Outputs[?OutputKey=='BucketName'].OutputValue" --output text)
           ROLE_ARN=$(aws cloudformation describe-stacks --stack-name photo-upload-infrastructure --query "Stacks[0].Outputs[?OutputKey=='LambdaExecutionRoleArn'].OutputValue" --output text)
           aws cloudformation deploy \
-            --template-file lambda/template.yml \
+            --template-file lambda/template.yaml \
             --stack-name photo-upload-lambda \
             --parameter-overrides S3BucketName=$BUCKET_NAME LambdaExecutionRoleArn=$ROLE_ARN \
             --capabilities CAPABILITY_IAM
