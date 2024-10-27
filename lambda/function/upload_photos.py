@@ -8,7 +8,7 @@ logger.setLevel(logging.INFO)
 
 s3_client = boto3.client('s3')
 
-def lambda_handler(event, context):
+def lambda_handler(_event, _context):
     bucket_name = os.environ['S3_BUCKET_NAME']
     photos_dir = Path(__file__).parent / 'photos'
 
