@@ -1,4 +1,4 @@
-name: Deploy Lambda
+name: Deploy Upload Photos Function
 
 on:
   workflow_run:

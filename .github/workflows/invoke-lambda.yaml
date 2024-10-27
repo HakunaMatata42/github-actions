@@ -1,0 +1,34 @@
+# .github/workflows/invoke-lambda.yml
+name: Invoke Upload Photos Function
+
+on:
+  workflow_call:
+    on: ["Deploy Upload Photos Function"]
+    types:
+      - completed
+
+  workflow_dispatch: # Allows manual trigger from GitHub Actions interface
+
+jobs:
+  invoke-lambda:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 # Update the region as per your Lambda function
+
+      - name: Invoke Lambda Function
+        id: invoke_lambda
+        run: |
+          aws lambda invoke \
+            --function-name upload-photos-function \
+            --payload '{}' \
+            output.json
+
+      - name: Display Lambda Invocation Result
+        run: |
+          cat output.json
