@@ -1,0 +1,50 @@
+name: Deploy Lambda
+
+on:
+  push:
+    paths:
+      - "lambda/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install boto3
+
+      - name: Package Lambda function
+        run: |
+          cd lambda/function
+          zip -r ../../lambda-package.zip .
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Upload Lambda package to S3
+        run: |
+          BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name photo-upload-infrastructure --query "Stacks[0].Outputs[?OutputKey=='BucketName'].OutputValue" --output text)
+          aws s3 cp lambda-package.zip s3://$BUCKET_NAME/lambda-package.zip
+
+      - name: Deploy Lambda function
+        run: |
+          BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name photo-upload-infrastructure --query "Stacks[0].Outputs[?OutputKey=='BucketName'].OutputValue" --output text)
+          ROLE_ARN=$(aws cloudformation describe-stacks --stack-name photo-upload-infrastructure --query "Stacks[0].Outputs[?OutputKey=='LambdaExecutionRoleArn'].OutputValue" --output text)
+          aws cloudformation deploy \
+            --template-file lambda/template.yml \
+            --stack-name photo-upload-lambda \
+            --parameter-overrides S3BucketName=$BUCKET_NAME LambdaExecutionRoleArn=$ROLE_ARN \
+            --capabilities CAPABILITY_IAM

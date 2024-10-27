@@ -1,0 +1,33 @@
+name: Deploy S3 bucket and IAM Role
+
+on:
+  push:
+    paths:
+      - "infrastructure/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: List repo structure
+        run: |
+          echo "Listing repository structure:"
+          ls -lah
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy to AWS CloudFormation
+        run: |
+          aws cloudformation deploy \
+            --template-file infrastructure/templates/template.yml \
+            --stack-name photo-upload-infrastructure \
+            --parameter-overrides BucketName=my-photo-bucket-${{ github.sha }} \
+            --capabilities CAPABILITY_IAM

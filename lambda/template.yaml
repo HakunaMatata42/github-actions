@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Lambda function for uploading photos to S3
+
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: Name of the S3 bucket to upload photos
+  LambdaExecutionRoleArn:
+    Type: String
+    Description: ARN of the Lambda execution role
+
+Resources:
+  UploadPhotosFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: upload-photos-function
+      Handler: upload_photos.lambda_handler
+      Role: !Ref LambdaExecutionRoleArn
+      Runtime: python3.9
+      Timeout: 30
+      MemorySize: 128
+      Environment:
+        Variables:
+          S3_BUCKET_NAME: !Ref S3BucketName
+      Code:
+        S3Bucket: !Ref S3BucketName
+        S3Key: lambda-package.zip
+
+Outputs:
+  LambdaFunctionName:
+    Description: Name of the Lambda function
+    Value: !Ref UploadPhotosFunction
