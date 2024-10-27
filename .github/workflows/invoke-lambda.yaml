@@ -2,12 +2,14 @@
 name: Invoke Upload Photos Function
 
 on:
-  workflow_call:
-    on: ["Deploy Upload Photos Function"]
-    types:
-      - completed
-
   workflow_dispatch: # Allows manual trigger from GitHub Actions interface
+  # Technically this should confirm that the latest version has been deployed but lets check that later
+  # workflow_call:
+  #   on: ["Deploy Upload Photos Function"]
+  #   types:
+  #     - completed
+
+  
 
 jobs:
   invoke-lambda:
